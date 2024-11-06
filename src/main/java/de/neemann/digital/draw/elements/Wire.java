@@ -9,6 +9,7 @@ import de.neemann.digital.core.ObservableValue;
 import de.neemann.digital.core.Value;
 import de.neemann.digital.core.element.Keys;
 import de.neemann.digital.draw.graphics.Graphic;
+import de.neemann.digital.draw.graphics.Orientation;
 import de.neemann.digital.draw.graphics.Style;
 import de.neemann.digital.draw.graphics.Vector;
 import de.neemann.digital.draw.graphics.VectorFloat;
@@ -16,6 +17,7 @@ import de.neemann.digital.draw.shapes.Drawable;
 import de.neemann.digital.draw.shapes.ObservableValueReader;
 import de.neemann.digital.gui.Settings;
 
+import java.awt.Color;
 import java.util.Collection;
 
 import static de.neemann.digital.draw.shapes.GenericShape.SIZE;
@@ -41,6 +43,10 @@ public class Wire implements Drawable, Movable, ObservableValueReader {
      * The second endpoint of the line
      */
     public Vector p2;
+    /**
+     * Color of the line
+     */
+    public Color color;
     //CHECKSTYLE.ON: VisibilityModifier
     private transient ObservableValue observableValue;
     private transient Value value;
@@ -61,6 +67,18 @@ public class Wire implements Drawable, Movable, ObservableValueReader {
     }
 
     /**
+     * Creates a new wire with a specified color
+     * @param p1 one end point
+     * @param p2 the other end point
+     * @param color the wire's color
+     */
+    public Wire(Vector p1, Vector p2, Color color) {
+        this.p1 = p1;
+        this.p2 = p2;
+        this.color = color;
+    }
+
+    /**
      * Copies a wire
      *
      * @param proto the wire to copy
@@ -70,6 +88,7 @@ public class Wire implements Drawable, Movable, ObservableValueReader {
         this.p2 = new Vector(proto.p2);
         this.p1Dot = proto.p1Dot;
         this.p2Dot = proto.p2Dot;
+        this.color = proto.color;
     }
 
     @Override
@@ -82,9 +101,16 @@ public class Wire implements Drawable, Movable, ObservableValueReader {
 
     @Override
     public void drawTo(Graphic graphic, Style highLight) {
+        // TODO to add wire coloring, just need to modify this hopefully?
+        // Also need an interface to set wire colours, that will be the harder part
         Style style = highLight;
-        if (style == null)
-            style = Style.getWireStyle(value);
+        if (style == null) {
+            if (color == null) {
+                style = Style.getWireStyle(value);
+            } else {
+                style = Style.getWireStyle(value).deriveColor(color);
+            }
+        }
 
         graphic.drawLine(p1, p2, style);
         if (highLight == Style.ERROR && graphic.isFlagSet(Graphic.Flag.tiny)) {
@@ -119,6 +145,7 @@ public class Wire implements Drawable, Movable, ObservableValueReader {
             graphic.drawText(numPos, Integer.toString(bits), de.neemann.digital.draw.graphics.Orientation.LEFTBOTTOM, Style.WIRE_BITS);
         }
 
+        // FIXME do I want to change the application order of dots for custom colored wires?
         if (p1Dot || p2Dot) {
             Vector r = new Vector(style.getThickness(), style.getThickness());
             if (p1Dot)
