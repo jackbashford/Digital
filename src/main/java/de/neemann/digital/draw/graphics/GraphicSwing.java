@@ -78,7 +78,8 @@ public class GraphicSwing extends Graphic {
     @Override
     public void drawLine(VectorInterface p1, VectorInterface p2, Style style) {
         applyStyle(style);
-        gr.drawLine(p1.getX(), p1.getY(), p2.getX(), p2.getY());
+        // FIXME found where we're drawing lines, yay :)
+//        gr.drawLine(p1.getX(), p1.getY(), p2.getX(), p2.getY());
     }
 
     @Override
@@ -95,6 +96,7 @@ public class GraphicSwing extends Graphic {
 
     @Override
     public void drawCircle(VectorInterface p1, VectorInterface p2, Style style) {
+        // circles!
         Vector w = Vector.width(p1, p2);
         if (w.x > pixelSize || w.y > pixelSize) {
             applyStyle(style);
